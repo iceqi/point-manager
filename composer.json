@@ -1,0 +1,19 @@
+{
+    "name": "vbot/point-manager",
+    "description": "Vbot积分管理",
+    "require": {},
+    "authors": [
+        {
+            "name": "Iceqi",
+            "email": "iceqi@iceqi.com"
+        }
+    ],
+    "require-dev": {
+        "hanson/vbot": "^2.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vbot\\PointManagger\\": "src/"
+        }
+    }
+}
