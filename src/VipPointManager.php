@@ -40,7 +40,7 @@ class VipPointManager extends AbstractMessageHandler
                     static::$array[$username] = [
                         'begin'  => 0,
                         'end'    => 100,
-                        'target' => random_int(1, 1000),
+                        'target' => random_int(1, 100),
                     ];
                 }
             } elseif (is_numeric($message['content']) && $isBegin) {
