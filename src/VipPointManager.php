@@ -6,12 +6,12 @@
  * Time: 下午3:46
  */
 
-namespace Vbot\PointManager;
+namespace Vbot\VipPointManager;
 use Hanson\Vbot\Extension\AbstractMessageHandler;
 use Hanson\Vbot\Message\Text;
 use Illuminate\Support\Collection;
 
-class PointManager extends AbstractMessageHandler
+class VipPointManager extends AbstractMessageHandler
 {
 
     public $author = 'Iceqi';
