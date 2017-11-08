@@ -17,75 +17,64 @@ use Illuminate\Support\Collection;
 class VipPointManager extends AbstractMessageHandler
 {
 
-    public $author = 'Iceqi';
-
-    public $version = '1.0';
-
-    public $name = 'vip_point_manager';
-
-    public $zhName = '积分管理';
-
-    private static $array = [];
-
+    public $role = 'user';
+    private $message;
     private $configs;
 
-    private $event_arr = [
+    public $author = 'Iceqi';
+    public $version = '1.0';
+    public $name = 'vip_point_manager';
+    public $zhName = '积分管理';
+    public $operation_message_obj;
+    private $_handle;
 
-        '积分变动'=>[['增加','减少']],
-        '移除用户'=>[
-            'user'
-        ],
-        '查询积分'=>[
-            'user'
-        ],
-    ];
-    private $_operation = [
-        '+' => ['str' => '增加', 'remind' => '请继续保持哦'],
-        '-' => ['str' => '减少', 'remind' => '请注意您的积分哦']
-    ];
+
 
     public function handler(Collection $message)
     {
-        if ($message['type'] === 'text' && $message['fromType'] === 'Group') {
+        $this->initMessage($message);
+        $this->initRole();
 
-            $group_name = $message['from']['NickName'];  //群名
-            $nickname = $message['sender']['NickName']; // 发消息的用户
-            $real_name = $message['sender']['RemarkName']; // 好友备注名称
-            $group_id = $message['from']['UserName']; //群组id
-            if (isset($this->config['groups'][$group_name]) && is_array($this->config['groups'][$group_name])) {
-                if ($real_name == $this->config['groups'][$group_name]['manager']) {
-                    $event_user = explode(' ', $message['pure']);
-                    if (count($event_user) > 0) {
-                        $event = $event_user[0];
-                        if (in_array($event, $this->event_arr)) {
-                            $operation = substr($event_user[1], -2, 1);
-                            $point = substr($event_user[1], -1, 1);
-                            $user = str_replace($point, '', str_replace($operation, '', $event_user[1]));
-                            if ($user_point = explode(':', $user)) {
-                                Text::send($group_id, "{$user} 管理员 ({$real_name}) {$this->_operation[$operation]['str']}了【{$point}】积分，{$this->_operation[$operation]['remind']}");
-                            }
-                        }
-                    }
-                }
-            } else {
-                if ($message['pure'] === '查积分') {
-                    Text::send($group_id, "@{$nickname} 积分查询成功");
-                }
+
+    }
+
+    public function initMessage($message)
+    {
+
+        $this->message = $message;
+        $this->message['user_obj'] = [
+            'group_name' => $message['from']['NickName'], //群名
+            'group_id' => $message['from']['UserName'],// 群组id
+            'nickname' => $message['sender']['NickName'], // 发消息的用户
+            'real_name' => $message['sender']['RemarkName'], // 好友备注名称
+        ];
+    }
+
+    private function initRole()
+    {
+
+        if (isset($this->config['groups'][$this->operation_message_obj['group_name']]) && is_array($this->config['groups'][$this->operation_message_obj['group_name']])) {
+            if ($this->message['real_name'] == $this->config['groups'][$this->operation_message_obj['group_name']]['manager']) {
+                $this->role = 'manager';
             }
         }
 
     }
 
-    public function operation()
-    {
+    private function eventManager(){
 
+       $this->_handle =  new Handler($this);
     }
 
-    public function execute()
+
+
+
+    public function is_group()
     {
-
+        if ($this->message['type'] === 'text' && $this->message['fromType'] === 'Group') {
+            return true;
+        }
     }
-
 
     /**
      * 注册拓展时的操作.
